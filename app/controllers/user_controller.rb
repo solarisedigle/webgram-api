@@ -3,7 +3,7 @@ class UserController < ApplicationController
     def register
         user = User.new
         user.username = params[:username]
-        user.password = params[:password].nil? ? '' : Digest::SHA2.hexdigest(params[:username] + @secret_key + params[:password])
+        user.password = params[:password]
         user.description = params[:description]
         user.activated = 0
         user.role = 'user'
@@ -20,7 +20,7 @@ class UserController < ApplicationController
     def login
         result = {}
         if(!params[:username].nil? && !params[:password].nil?)
-            user = User.where(username: params[:username], password: Digest::SHA2.hexdigest(params[:username] + @secret_key + params[:password]))
+            user = User.where(username: params[:username], password: params[:password])
             if user.length > 0
                 user = user[0]
                 token = JWT.encode({user: user.id, exp: Time.now.to_i + 300}, @secret_key, 'HS256')
