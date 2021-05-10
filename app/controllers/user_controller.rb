@@ -1,3 +1,4 @@
+require 'digest'
 class UserController < ApplicationController
     def register
         user = User.new
