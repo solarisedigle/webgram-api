@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(version: 2021_05_10_120236) do
     t.string "username"
     t.string "password"
     t.text "description"
-    t.integer "activated", limit: 2
+    t.bigint "activated"
     t.string "role"
     t.integer "last_action"
     t.datetime "created_at", precision: 6, null: false

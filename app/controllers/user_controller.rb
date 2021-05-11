@@ -34,7 +34,7 @@ class UserController < ApplicationController
         result = {}
         if(!params[:username].nil? && !params[:password].nil?)
             user = User.where(username: params[:username], password: Digest::SHA2.hexdigest(params[:username] + @secret_key + params[:password]))
-            if user.length > 0
+            if user.length == 1
                 user = user[0]
                 token = JWT.encode({user: user.id, exp: Time.now.to_i + 300}, @secret_key, 'HS256')
                 result = {:success => true, :token => token}
