@@ -33,16 +33,21 @@ class UserController < ApplicationController
     def login
         result = {}
         if(!params[:username].nil? && !params[:password].nil?)
-            user = User.where(username: params[:username], password: Digest::SHA2.hexdigest(params[:username] + @secret_key + params[:password]))
-            if user.length == 1
-                user = user[0]
-                token = JWT.encode({user: user.id, exp: Time.now.to_i + 300}, @secret_key, 'HS256')
-                result = {:success => true, :token => token}
+            users = User.where(username: params[:username], password: Digest::SHA2.hexdigest(params[:username] + @secret_key + params[:password]))
+            if users.length == 1
+                user = users[0]
+                if user.activated == 0
+                    token = JWT.encode({user: user.id}, @secret_key, 'HS256')
+                    result = {:success => false, :token => token, :reason => "Account is not verified", :code => 403}
+                else
+                    token = JWT.encode({user: user.id, exp: Time.now.to_i + 300}, @secret_key, 'HS256')
+                    result = {:success => true, :token => token}
+                end
             else
-                result = {:success => false, :reason => "Login failed"}
+                result = {:success => false, :reason => "Login failed", :code => 401}
             end
         else
-            result = {:success => false, :reason => "Incorrect query"}
+            result = {:success => false, :reason => "Incorrect query", :code => 422}
         end
         render json: result
     end
