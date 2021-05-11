@@ -37,7 +37,7 @@ class UserController < ApplicationController
             if users.length == 1
                 user = users[0]
                 if user.activated == 0
-                    token = JWT.encode({user: user.id}, @secret_key, 'HS256')
+                    token = JWT.encode({applicant: user.id}, @secret_key, 'HS256')
                     result = {:success => false, :token => token, :reason => "Account is not verified", :code => 403}
                 else
                     token = JWT.encode({user: user.id, exp: Time.now.to_i + 300}, @secret_key, 'HS256')
