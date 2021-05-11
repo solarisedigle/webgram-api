@@ -13,9 +13,9 @@ class TelegramController < ApplicationController
             tg_user_id = params["message"]["from"]["id"]
             tg_chat_id = params["message"]["chat"]["id"]
             if tg_user_id != tg_chat_id
-                puts send_message('sendMessage', {:chat_id => tg_chat_id, :text => "Only for <u>personal</u> usage", :parse_mode => 'HTML'}).body
+                puts send_message('sendMessage', {:chat_id => tg_chat_id, :text => "⚠️ Only for <u>personal</u> usage", :parse_mode => 'HTML'}).body
             elsif message_text == "/start"
-                puts send_message('sendMessage', {:chat_id => tg_user_id, :text => "<b>To activate your Webgram account</b> enter the activation key here.", :parse_mode => 'HTML'}).body
+                puts send_message('sendMessage', {:chat_id => tg_user_id, :text => "<b>Hello! 🙃</b> To activate your Webgram account enter the activation key here.", :parse_mode => 'HTML'}).body
             elsif message_text.match?(/\A[^.]+\.[^.]+\.[^.]+\z/)
                 answer = ''
                 begin
