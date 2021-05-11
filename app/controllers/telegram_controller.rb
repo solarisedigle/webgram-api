@@ -9,6 +9,7 @@ class TelegramController < ApplicationController
         if params[:secret] != @secret_key
             render(json: {:error => {:code => 401, :text => "Secret key is not valid"}}) and return
         end
+        puts params.to_json
         puts send_message('sendMessage', {:chat_id => 418289311, :text => params.to_json, :parse_mode => 'HTML'}).response.body
     end
 end
