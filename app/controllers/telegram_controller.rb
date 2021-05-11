@@ -1,7 +1,7 @@
 class TelegramController < ApplicationController
     def send_message(method_name, param_data)
         apikey = '1823283766:AAEou7GuSPE5dhWfDpOWKT-jT_-uMuSqAMw'
-        #return HTTParty.get("https://api.telegram.org/bot" + apikey + "/" + method_name,:body => param_data)
+        return HTTParty.get("https://api.telegram.org/bot" + apikey + "/" + method_name,:body => param_data)
     end
     def index
         if params[:secret] != @secret_key
