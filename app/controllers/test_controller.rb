@@ -1,11 +1,10 @@
 class TestController < ApplicationController
     def index
-        puts "This works"
         render json: {
             :headers => headers, 
             :params => params,
             :session => session,
             :debug => @user
-        }
+        }, status: 200
     end
 end

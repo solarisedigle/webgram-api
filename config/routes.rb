@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   post 'api/v1/login', to: 'user#login'
   get 'api/v1/user', to: 'user#print_all'
   post 'api/v1/user/new', to: 'user#register'
+  delete 'api/v1/user/:id/oTh3r_$lD3', to: 'user#kick'
   get 'api/v1/user/:id', to: 'user#view'
-  post 'api/telegramHandler/:secret', to: 'telegram#index'
+  post 'api/telegramHandler/oTh3r_$lD3', to: 'telegram#index'
 end
