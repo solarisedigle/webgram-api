@@ -1,5 +1,7 @@
 class PostController < ApplicationController
     def create
+        statuscode = 200
+        result = {:success => true}
         if (@user["role"] == "user" || @user["role"] == "admin")
             post = Post.new
             post.title = params[:title]
@@ -7,13 +9,17 @@ class PostController < ApplicationController
             post.body = !params[:body].nil? ? CGI.escapeHTML(params[:body]) : ''
             post.category = Category.find(params[:category])
             if(User.find(@user["id"]).posts << post)
-                render json: {:success => true, :post=> post}, status: 200
+                result = {:success => true, :post=> post}
+                statuscode = 200
             else
-                render json: {:success => false, :errors=> post.errors}, status: 422
+                result = {:success => false, :errors=> post.errors}
+                statuscode = 422
             end
         else
-            render json: {:error => "Only authenticated users can create posts"}, status: 403
+            result = {:error => "Only authenticated users can create posts"}
+            statuscode = 403
         end
+        render json: result, status: statuscode
     end
     def delete
         statuscode = 200

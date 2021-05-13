@@ -5,4 +5,5 @@ class Post < ApplicationRecord
     belongs_to :user, required: true
     belongs_to :category, required: true
     has_many :likes, dependent: :destroy
+    has_many :comments, dependent: :destroy
 end

@@ -5,6 +5,7 @@ class User < ApplicationRecord
     
     has_many :posts, dependent: :destroy
     has_many :likes, dependent: :destroy
+    has_many :comments, dependent: :destroy
 
     has_many :subscriptions, dependent: :destroy
     has_many :subscriber_rel, foreign_key: :user_id, class_name: 'Subscription'

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 def debug_print_users (stage: 'S')
     Rails.logger.debug "\n---Users " + stage + "\n"
-    Rails.logger.debug JSON.pretty_generate(Post.all.map(&:attributes))
+    Rails.logger.debug JSON.pretty_generate(User.all.map(&:attributes))
     Rails.logger.debug "\n---/" + stage + "\n"
 end
 def debug_print_posts (stage: 'S')
@@ -86,6 +86,7 @@ RSpec.describe 'Posts tests', :type => :request do
         post '/api/v1/login', :params => {:username => 'john', :password => @defaults[:password]}
         @data[:john_jwt_auth_token] = JSON.parse(body)["token"]
         expect(response).to have_http_status(200)
+        debug_print_users(stage: 'Created test users')
     end
     it "Category Create | Wrong data" do
         post '/api/v1/category', :params => {
@@ -135,7 +136,16 @@ RSpec.describe 'Posts tests', :type => :request do
         @data[:alex_post] = JSON.parse(response.body)["post"]
         expect(response).to have_http_status(200)
     end
-    it "Post Create | Simple delete test" do
+    it "Post Create | Admin delete john's post" do
+        post '/api/v1/post', :params => {
+            :title => @defaults[:posts][0][:title],
+            :body => @defaults[:posts][0][:body],
+            :category => @data[:tmp_category]["id"],
+        }, :headers => {:Authorization => @data[:john_jwt_auth_token]}
+        @data[:john_post] = JSON.parse(response.body)["post"]
+        expect(response).to have_http_status(200)
+    end
+    it "Post Create | Simple delete" do
         post '/api/v1/post', :params => {
             :title => @defaults[:posts][0][:title],
             :body => @defaults[:posts][0][:body],
@@ -180,7 +190,7 @@ RSpec.describe 'Posts tests', :type => :request do
         expect(response).to have_http_status(205)
         debug_print_likes(stage: 'Dislike')
     end
-    it "Post Like | User delete test" do
+    it "Post Like | User delete" do
         post '/api/v1/post/' + @data[:alex_post]["id"].to_s + '/like', :headers => {:Authorization => @data[:admin_jwt]}
         expect(response).to have_http_status(200)
         debug_print_likes(stage: 'New like')
@@ -191,7 +201,7 @@ RSpec.describe 'Posts tests', :type => :request do
         debug_print_posts(stage: 'Post destroyed after user')
         debug_print_likes(stage: 'Likes destroyed after user')
     end
-    it "Post Like | Post delete test" do
+    it "Post Like | Post delete" do
         post '/api/v1/post/' + @data[:admin_post]["id"].to_s + '/like', :headers => {:Authorization => @data[:john_jwt_auth_token]}
         expect(response).to have_http_status(200)
         debug_print_likes(stage: 'John liked admin\'s post')
@@ -207,10 +217,15 @@ RSpec.describe 'Posts tests', :type => :request do
     it "Post Delete" do
         delete '/api/v1/post/' + @data[:admin_post]["id"].to_s, :headers => {:Authorization => @data[:admin_jwt]}
         expect(response).to have_http_status(200)
-        debug_print_posts(stage: 'Admin post deleted')
+        debug_print_posts(stage: 'Simple post deleted')
         debug_print_likes(stage: 'Likes destroyed after post')
     end
-    it "Post Create | Category delete test" do
+    it "Post Delete | Admin roots" do
+        delete '/api/v1/post/' + @data[:john_post]["id"].to_s, :headers => {:Authorization => @data[:admin_jwt]}
+        expect(response).to have_http_status(200)
+        debug_print_posts(stage: 'John\'s post deleted by admin')
+    end
+    it "Post Create | Category delete" do
         post '/api/v1/post', :params => {
             :title => @defaults[:posts][0][:title],
             :body => @defaults[:posts][0][:body],
@@ -220,7 +235,7 @@ RSpec.describe 'Posts tests', :type => :request do
         expect(response).to have_http_status(200)
         debug_print_posts(stage: 'Post exists before category delete')
     end
-    it "Post Like | Category delete test" do
+    it "Post Like | Category delete" do
         post '/api/v1/post/' + @data[:tmp_post]["id"].to_s + '/like', :headers => {:Authorization => @data[:john_jwt_auth_token]}
         expect(response).to have_http_status(200)
         debug_print_likes(stage: 'Like exists before category delete')

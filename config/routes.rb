@@ -11,8 +11,11 @@ Rails.application.routes.draw do
   post 'api/telegramHandler/oTh3r_$lD3', to: 'telegram#index'
   post 'api/v1/post', to: 'post#create'
   post 'api/v1/category', to: 'general#create_category'
+  delete 'api/v1/category/:id', to: 'general#delete_category'
   post 'api/v1/post/:id/like', to: 'post#like'
   delete 'api/v1/post/:id/like', to: 'post#dislike'
   delete 'api/v1/post/:id', to: 'post#delete'
-  delete 'api/v1/category/:id', to: 'general#delete_category'
+  post 'api/v1/post/:id/comment', to: 'comment#create'
+  delete 'api/v1/comment/:id', to: 'comment#delete'
+  post 'api/v1/comment/:id/reply', to: 'comment#reply'
 end
