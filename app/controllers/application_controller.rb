@@ -11,6 +11,8 @@ class ApplicationController < ActionController::API
                 @user = User.where(id: decoded_token[0]["user"])
                 if @user.length != 1 
                     render json: {:error => "Fatal error: User " + decoded_token[0]["user"].to_s + " not found"}, status: 404
+                else
+                    @user = @user[0]
                 end
             rescue JWT::DecodeError
                 render json: {:error => "Authorization token is not valid"}, status: 401

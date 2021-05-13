@@ -3,7 +3,7 @@ class UserController < ApplicationController
         user = User.new
         user.username = params[:username]
         user.password = params[:password].nil? ? '' : Digest::SHA2.hexdigest(params[:username] + @secret_key + params[:password])
-        user.description = params[:description]
+        user.description = !params[:description].nil? ? CGI.escapeHTML(params[:description]) : ''
         user.activated = 0
         user.role = 'user'
         user.last_action = Time.now.to_i
@@ -38,14 +38,21 @@ class UserController < ApplicationController
     end
     def kick
         statuscode = 200
-        user = User.where(id: params[:id])
-        if user.length > 0
-            if !user[0].destroy()
-                statuscode = 500
+        result = {:success => true}
+        if (@user["role"] == "admin")
+            user = User.where(id: params[:id])
+            if user.length > 0
+                if !user[0].destroy()
+                    statuscode = 500
+                    result = {:error => "Fatal server error: User " + params[:id] + " destroy"}
+                end
+            else
+                result = {:error => "Fatal error: User " + params[:id] + " not found"}
+                statuscode = 404
             end
         else
-            result = {:error => "Fatal error: User " + params[:id] + " not found"}
-            statuscode = 404
+            result = {:error => "Permission eror"}
+            statuscode = 403
         end
         render json: result, status: statuscode
     end
@@ -71,6 +78,65 @@ class UserController < ApplicationController
         else
             result = {:success => false, :reason => "Incorrect query"}
             statuscode = 422
+        end
+        render json: result, status: statuscode
+    end
+    def subscribe
+        statuscode = 200
+        result = {:success => true}
+        if (@user["role"] == "user" || @user["role"] == "admin")
+            user = User.where(id: params[:id])
+            if user.length > 0
+                if Subscription.find_by(user: user[0], subscriber: @user).nil?
+                    subscription = Subscription.new()
+                    subscription.user = user[0]
+                    subscription.subscriber = @user
+                    if subscription.save()
+                        result = {:success => true}
+                        statuscode = 200
+                    else
+                        result = {:error => "Fatal server error: Subscription"}
+                        statuscode = 500
+                    end
+                else
+                    result = {:success => false, :error => "Subscription already exists"}
+                    statuscode = 205
+                end
+            else
+                result = {:error => "Fatal error: User " + params[:id] + " not found"}
+                statuscode = 404
+            end
+        else
+            result = {:error => "Only registered user can interact"}
+            statuscode = 403
+        end
+        render json: result, status: statuscode
+    end
+    def unsubscribe
+        statuscode = 200
+        result = {:success => true}
+        if (@user["role"] == "user" || @user["role"] == "admin")
+            user = User.where(id: params[:id])
+            if user.length > 0
+                if !(subscription = Subscription.find_by(user: user[0], subscriber: @user)).nil?
+                    if subscription.destroy()
+                        result = {:success => true}
+                        statuscode = 200
+                    else
+                        result = {:error => "Fatal server error: Unsubscription"}
+                        statuscode = 500
+                    end
+                else
+                    result = {:success => false, :error => "Subscription already don't exists"}
+                    statuscode = 205
+                end
+            else
+                result = {:error => "Fatal error: User " + params[:id] + " not found"}
+                statuscode = 404
+            end
+        else
+            result = {:error => "Only registered user can interact"}
+            statuscode = 403
         end
         render json: result, status: statuscode
     end

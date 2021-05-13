@@ -4,7 +4,10 @@ class TestController < ApplicationController
             :headers => headers, 
             :params => params,
             :session => session,
-            :debug => @user
+            :debug => @user,
+            :categories => Category.all,
+            :users => User.all,
+            :posts => Post.all,
         }, status: 200
     end
 end
