@@ -132,17 +132,6 @@ RSpec.describe 'Webgram tests', :type => :request do
         @data[:admin_jwt] = JSON.parse(body)["token"]
         expect(response).to have_http_status(200)
     end
-    it "Category Delete | Permission error" do
-        delete '/api/v1/category/' + @defaults[:posts][0][:category].to_s, :headers => {:Authorization => @data[:first_jwt_auth_token]}
-        expect(response).to have_http_status(403)
-    end
-    it "Category Create | Permission error" do
-        post '/api/v1/category', :params => {
-            :name => @defaults[:categories][0][:name],
-            :description => @defaults[:categories][0][:description],
-        }, :headers => {:Authorization => @data[:first_jwt_auth_token]}
-        expect(response).to have_http_status(403)
-    end
     it "Create second user" do
         post '/api/v1/user', :params => {:username => @defaults[:users][1][:username], :password => @defaults[:users][1][:password]}
         expect(response).to have_http_status(200)
@@ -170,73 +159,6 @@ RSpec.describe 'Webgram tests', :type => :request do
         get '/', :headers => {:Authorization => @data[:first_jwt_auth_token]}
         expect(response).to have_http_status(200)
     end
-    it "Post Create | Not authorised" do
-        post '/api/v1/post', :params => {
-            :title => @defaults[:posts][0][:title],
-            :body => @defaults[:posts][0][:body],
-            :category => @defaults[:posts][0][:category],
-        }
-        expect(response).to have_http_status(403)
-    end
-    it "Post Create | Wrong data" do
-        post '/api/v1/post', :params => {
-            :title => @defaults[:posts][0][:title],
-            :body => @defaults[:posts][0][:body],
-            :image => 'Not an image',
-            :category => @defaults[:posts][0][:category],
-        }, :headers => {:Authorization => @data[:first_jwt_auth_token]}
-        expect(response).to have_http_status(422)
-    end
-    it "Post Create | As User" do
-        post '/api/v1/post', :params => {
-            :title => @defaults[:posts][0][:title],
-            :body => @defaults[:posts][0][:body],
-            :category => @defaults[:posts][0][:category],
-        }, :headers => {:Authorization => @data[:first_jwt_auth_token]}
-        @data["user_post"] = JSON.parse(response.body)["post"]
-        expect(response).to have_http_status(200)
-    end
-    it "Post Create | As Admin" do
-        post '/api/v1/post', :params => {
-            :title => @defaults[:posts][0][:title],
-            :body => @defaults[:posts][0][:body],
-            :image => @defaults[:posts][0][:image],
-            :category => @defaults[:posts][0][:category],
-        }, :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(200)
-    end
-    it "Post Like | Fake post" do
-        post '/api/v1/post/-1/like', :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(404)
-    end
-    it "Post Like | No auth" do
-        post '/api/v1/post/' + @data["user_post"]["id"].to_s + '/like'
-        expect(response).to have_http_status(403)
-    end
-    it "Post Like" do
-        post '/api/v1/post/' + @data["user_post"]["id"].to_s + '/like', :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(200)
-    end
-    it "Post Like | Exists" do
-        post '/api/v1/post/' + @data["user_post"]["id"].to_s + '/like', :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(205)
-    end
-    it "Post Dislike | Fake post" do
-        delete '/api/v1/post/-1/like', :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(404)
-    end
-    it "Post Dislike | No auth" do
-        delete '/api/v1/post/' + @data["user_post"]["id"].to_s + '/like'
-        expect(response).to have_http_status(403)
-    end
-    it "Post Dislike" do
-        delete '/api/v1/post/' + @data["user_post"]["id"].to_s + '/like', :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(200)
-    end
-    it "Post Dislike | Like not exists" do
-        delete '/api/v1/post/' + @data["user_post"]["id"].to_s + '/like', :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(205)
-    end
     it "User delete | Fake id" do
         delete '/api/v1/user/-1', :headers => {:Authorization => @data[:admin_jwt]}
         expect(response).to have_http_status(404)
@@ -249,47 +171,6 @@ RSpec.describe 'Webgram tests', :type => :request do
     it "Auth | Fake user" do
         get '/', :headers => {:Authorization => @data[:first_jwt_auth_token]}
         expect(response).to have_http_status(404)
-    end
-    it "Category Create | Wrong data" do
-        post '/api/v1/category', :params => {
-            :name => '',
-            :description => @defaults[:categories][0][:description],
-        }, :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(422)
-    end
-    it "Category Create" do
-        post '/api/v1/category', :params => {
-            :name => @defaults[:categories][0][:name],
-            :description => @defaults[:categories][0][:description],
-        }, :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(200)
-    end
-    it "Category Delete | Fake id" do
-        delete '/api/v1/category/-1', :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(404)
-    end
-    it "Category Delete" do
-        delete '/api/v1/category/' + @defaults[:posts][0][:category].to_s, :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(200)
-    end
-    it "Post Delete | Permission error" do
-        post = Post.new()
-        post.title = "Test title"
-        post.body = "Test body"
-        post.user = User.find_by(role: 'admin')
-        post.category = Category.first()
-        post.save()
-        @data["tmp_post"] = post
-        delete '/api/v1/post/' + post.id.to_s
-        expect(response).to have_http_status(403)
-    end
-    it "Post Delete | Fake id" do
-        delete '/api/v1/post/-1'
-        expect(response).to have_http_status(404)
-    end
-    it "Post Delete" do
-        delete '/api/v1/post/' + @data["tmp_post"]["id"].to_s, :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(200)
     end
     it "Users list" do
         get '/api/v1/user'

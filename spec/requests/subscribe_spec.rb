@@ -16,7 +16,7 @@ def debug_print_subscriptions (stage: 'S')
     Rails.logger.debug JSON.pretty_generate(Subscription.all.map(&:attributes))
     Rails.logger.debug "\n---/" + stage + "\n"
 end
-RSpec.describe 'Users relations tests', :type => :request do
+RSpec.describe 'Subscribe tests', :type => :request do
     before(:all) do
         @data = {
             :users => {}

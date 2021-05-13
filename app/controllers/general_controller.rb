@@ -29,6 +29,8 @@ class GeneralController < ApplicationController
             if !category.save
                 statuscode = 422
                 result = {:success => false, :errors=> category.errors}
+            else
+                result[:category] = category
             end
         else
             result = {:error => "Only admin can create the category"}

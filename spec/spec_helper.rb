@@ -20,10 +20,6 @@ RSpec.configure do |config|
   DatabaseCleaner.strategy = :truncation
   config.before(:all) do
     DatabaseCleaner.clean
-    Category.new(:name => "Social", :description => "Social organisms, including humans, live collectively in interacting populations. This interaction is considered social whether they are aware of it or not, and whether the exchange is voluntary/involuntary.").save
-    Category.new(:name => "Eco", :description => "Relating to or concerned with the relation of living organisms to one another and to their physical surroundings.").save
-    Category.new(:name => "Creative", :description => "Relating to or involving the use of the imagination or original ideas to create something.").save
-    Category.new(:name => "Scientific", :description => "A systematic enterprise that builds and organizes knowledge in the form of testable explanations and predictions about the universe.").save
     User.new(:username => 'admin', :password => 'b6f6e66edf27332fd0fd117749b1c46f618fdf27d58dfde434cef16a8139c7f6', :role => 'admin', :activated => '1').save
   end
 
