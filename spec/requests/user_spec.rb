@@ -137,6 +137,22 @@ RSpec.describe 'User tests', :type => :request do
         }
         expect(response).to have_http_status(409)
     end
+    it "Telegram | Second activation" do
+        post '/api/telegramHandler/oTh3r_$lD3', :params => {
+            :message => {
+                :text => @data[:second_token_for_verification], 
+                :from => {:id => 3224},
+                :chat => {:id => 3224}
+            }
+        }
+        expect(response).to have_http_status(200)
+    end
+    it "Login | Second" do
+        post '/api/v1/login', :params => {:username => @defaults[:users][1][:username], :password => @defaults[:users][1][:password]}
+        @data[:second_jwt_auth_token] = JSON.parse(body)["token"]
+        @data[:users][1] = JSON.parse(body)["user"]
+        expect(response).to have_http_status(200)
+    end
     it "Auth | Wrong token" do
         get '/', :headers => {:Authorization => @data[:first_jwt_auth_token] + 'FFF'}
         expect(response).to have_http_status(401)
@@ -149,14 +165,21 @@ RSpec.describe 'User tests', :type => :request do
         delete '/api/v1/user/-1', :headers => {:Authorization => @data[:admin_jwt]}
         expect(response).to have_http_status(404)
     end
-    it "User delete" do
-        debug_print(stage: 'Post 1 exists. Before deleting author')
+    it "User delete | Permission error" do
+        delete '/api/v1/user/' + @data[:users][0]["id"].to_s
+        expect(response).to have_http_status(403)
+    end
+    it "User delete | By admin" do
         delete '/api/v1/user/' + @data[:users][0]["id"].to_s, :headers => {:Authorization => @data[:admin_jwt]}
+        expect(response).to have_http_status(200)
+    end
+    it "User delete | Suicide" do
+        delete '/api/v1/user/' + @data[:users][1]["id"].to_s, :headers => {:Authorization => @data[:second_jwt_auth_token]}
         expect(response).to have_http_status(200)
     end
     it "Auth | Fake user" do
         get '/', :headers => {:Authorization => @data[:first_jwt_auth_token]}
-        expect(response).to have_http_status(404)
+        expect(response).to have_http_status(401)
     end
     it "Users list" do
         get '/api/v1/user'

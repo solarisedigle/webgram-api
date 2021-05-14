@@ -39,7 +39,7 @@ class UserController < ApplicationController
     def kick
         statuscode = 200
         result = {:success => true}
-        if (@user["role"] == "admin")
+        if (@user["role"] == "admin" || @user["id"].to_s == params[:id])
             user = User.where(id: params[:id])
             if user.length > 0
                 if !user[0].destroy()
