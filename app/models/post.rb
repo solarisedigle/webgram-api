@@ -8,4 +8,11 @@ class Post < ApplicationRecord
     has_many :comments, dependent: :destroy
     has_many :posts_tags, dependent: :destroy, class_name: 'TagPost'
     has_many :tags, through: :posts_tags
+    after_destroy :clean_data
+    def clean_data
+        if !self.image.nil?
+            public_id = self.image.split('/')[-1].split('.')[0]
+            Cloudinary::Uploader.destroy(public_id, options = {})
+        end
+    end
 end

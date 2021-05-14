@@ -5,7 +5,22 @@ class PostController < ApplicationController
         if (@user["role"] == "user" || @user["role"] == "admin")
             post = Post.new
             post.title = params[:title]
-            post.image = params[:image]
+            if !params[:image].nil?
+                if (params[:image].is_a?(ActionDispatch::Http::UploadedFile) && (params[:image].content_type == "image/jpeg" || params[:image].content_type == "image/png"))
+                    if params[:image].size < 7.megabytes
+                        begin
+                            uploaded = Cloudinary::Uploader.upload(params[:image], options = {})
+                        rescue CloudinaryException
+                            render(json: {:success => false, :errors => {:image => "image upload failed"}}, status: 409) and return
+                        end
+                        post.image = uploaded["secure_url"]
+                    else
+                        render(json: {:success => false, :errors => {:image => "image size must be less than 7 Mb"}}, status: 413) and return
+                    end
+                else
+                    render(json: {:success => false, :errors => {:image => "supports only jpeg and png formats"}}, status: 422) and return
+                end
+            end
             post.body = !params[:body].nil? ? CGI.escapeHTML(params[:body]) : ''
             post.category = Category.find(params[:category])
             if(User.find(@user["id"]).posts << post)

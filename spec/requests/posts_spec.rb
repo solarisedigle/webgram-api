@@ -149,7 +149,6 @@ RSpec.describe 'Posts tests', :type => :request do
         post '/api/v1/post', :params => {
             :title => @defaults[:posts][0][:title],
             :body => @defaults[:posts][0][:body],
-            :image => @defaults[:posts][0][:image],
             :category => @data[:tmp_category]["id"],
         }, :headers => {:Authorization => @data[:admin_jwt]}
         expect(response).to have_http_status(200)
