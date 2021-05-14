@@ -1,5 +1,6 @@
 # README
 
+## A word spoken is past recalling.
 ### Some usefull commands:
 
 ##### Recreate database:

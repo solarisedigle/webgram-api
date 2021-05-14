@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-    validates :username, uniqueness: { case_sensitive: false }, format: { with: /\A^(?=.{4,30}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$\z/, message: "5-30 characters. Only [A-Z], [a-z] and delimiters [.] [_] are allowed" }
+    validates :username, uniqueness: { case_sensitive: false }, format: { with: /\A^(?=.{4,30}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$\z/, message: "4-30 characters. Only [A-Z], [a-z], [0-9] and delimiters [.] [_] are allowed" }
     validates :description, length: { maximum: 200 }
     validates :password, presence: true
     

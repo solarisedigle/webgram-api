@@ -86,6 +86,7 @@ RSpec.describe 'Comments tests', :type => :request do
       post '/api/v1/login', :params => {:username => 'john', :password => @defaults[:password]}
       @data[:john] = JSON.parse(body)
       expect(response).to have_http_status(200)
+      debug_print_users(stage: 'Users created for tests')
   end
   it "Category Create" do
       post '/api/v1/category', :params => {
@@ -203,6 +204,6 @@ RSpec.describe 'Comments tests', :type => :request do
     delete '/api/v1/post/' + @data[:tmp_post]["id"].to_s, :headers => {:Authorization => @data[:admin_jwt]}
     expect(response).to have_http_status(200)
     debug_print_comments(stage: 'Deleted Main post and comments')
-end
+  end
 end
 

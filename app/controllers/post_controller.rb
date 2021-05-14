@@ -9,8 +9,26 @@ class PostController < ApplicationController
             post.body = !params[:body].nil? ? CGI.escapeHTML(params[:body]) : ''
             post.category = Category.find(params[:category])
             if(User.find(@user["id"]).posts << post)
-                result = {:success => true, :post=> post}
-                statuscode = 200
+                if !params[:tags].nil? && params[:tags].kind_of?(Array)
+                    for tagname in params[:tags] do
+                        tag = Tag.find_or_create_by(name: tagname.downcase)
+                        if !tag.save()
+                            result[:success] = false
+                            statuscode = 203
+                            if result[:errors].nil?
+                                result[:errors] = []
+                            end
+                            result[:errors].push(tag.errors)
+                        else
+                            post.tags << tag
+                            if result[:tags].nil?
+                                result[:tags] = []
+                            end
+                            result[:tags].push(tag)
+                        end
+                    end
+                end
+                result[:post] = post
             else
                 result = {:success => false, :errors=> post.errors}
                 statuscode = 422
