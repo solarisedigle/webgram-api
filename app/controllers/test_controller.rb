@@ -8,6 +8,8 @@ class TestController < ApplicationController
             :categories => Category.all,
             :users => User.all,
             :posts => Post.all,
+            :tags => Tag.all,
+            :tagsposts => TagPost.all,
         }, status: 200
     end
 end

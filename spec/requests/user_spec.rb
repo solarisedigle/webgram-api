@@ -154,7 +154,7 @@ RSpec.describe 'User tests', :type => :request do
         expect(response).to have_http_status(200)
     end
     it "Auth | Wrong token" do
-        get '/', :headers => {:Authorization => @data[:first_jwt_auth_token] + 'FFF'}
+        post '/api/v1/post', :headers => {:Authorization => @data[:first_jwt_auth_token] + 'FFF'}
         expect(response).to have_http_status(401)
     end
     it "Auth" do

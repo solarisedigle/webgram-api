@@ -7,7 +7,7 @@ class CommentController < ApplicationController
             if post.length > 0
                 comment = Comment.new()
                 comment.user = @user
-                comment.body = !params[:body].nil? ? CGI.escapeHTML(params[:body]) : ''
+                comment.body = !params[:body].blank? ? CGI.escapeHTML(params[:body]) : ''
                 if(post[0].comments << comment)
                     result = {:success => true, :comment=> comment}
                     statuscode = 200

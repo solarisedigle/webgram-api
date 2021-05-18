@@ -1,6 +1,6 @@
 class TagPost < ApplicationRecord
   belongs_to :post
-  belongs_to :tag
+  belongs_to :tag, counter_cache: :count_of_posts
   after_destroy :clean_up_unused_tags
   def clean_up_unused_tags
     tags_to_delete = Tag.where(id: self.tag.id)

@@ -15,7 +15,11 @@ class ApplicationController < ActionController::API
                     @user = @user[0]
                 end
             rescue JWT::DecodeError
-                render json: {:error => "Authorization token is not valid"}, status: 401
+                if(request.method != "GET")
+                    render json: {:error => "Authorization token is not valid"}, status: 401
+                else
+                    @user = {:role => 'guest'}
+                end
             end
         end
     end

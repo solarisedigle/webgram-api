@@ -25,7 +25,7 @@ class GeneralController < ApplicationController
         if (@user["role"] == "admin")
             category = Category.new
             category.name = params[:name]
-            category.description =  !params[:description].nil? ? CGI.escapeHTML(params[:description]) : ''
+            category.description =  !params[:description].blank? ? CGI.escapeHTML(params[:description]) : ''
             if !category.save
                 statuscode = 422
                 result = {:success => false, :errors=> category.errors}
@@ -37,6 +37,9 @@ class GeneralController < ApplicationController
             statuscode = 403
         end
         render json: result, status: statuscode
+    end
+    def categories_list
+        render json: Category.all, status: 200
     end
     def delete_tag
         statuscode = 200
@@ -77,5 +80,16 @@ class GeneralController < ApplicationController
             statuscode = 403
         end
         render json: result, status: statuscode
+    end
+    def complete_tags
+        if !params[:tag] 
+            params[:tag] = ''
+        end
+        except = []
+        if params[:except] 
+            except = params[:except]
+        end
+        tags = Tag.where("name like ?", "%#{params[:tag]}%").where.not(name: except).limit(5).order("count_of_posts desc")
+        render json: {tags: tags}, status: 200
     end
 end

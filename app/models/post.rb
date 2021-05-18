@@ -6,8 +6,8 @@ class Post < ApplicationRecord
     belongs_to :category, required: true
     has_many :likes, dependent: :destroy
     has_many :comments, dependent: :destroy
-    has_many :posts_tags, dependent: :destroy, class_name: 'TagPost'
-    has_many :tags, through: :posts_tags
+    has_many :tag_posts, dependent: :destroy, class_name: 'TagPost'
+    has_many :tags, through: :tag_posts
     after_destroy :clean_data
     def clean_data
         if !self.image.nil?

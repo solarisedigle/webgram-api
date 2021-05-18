@@ -1,6 +1,6 @@
 require "net/http"
 class TelegramController < ApplicationController
-    def send_message(method_name, param_data)
+    def send_query(method_name, param_data)
         apikey = '1823283766:AAEou7GuSPE5dhWfDpOWKT-jT_-uMuSqAMw'
         Rails.logger.debug '---CC | Telegram response: ' + Net::HTTP.post_form(URI.parse("https://api.telegram.org/bot" + apikey + "/" + method_name), param_data).body
     end
@@ -11,10 +11,10 @@ class TelegramController < ApplicationController
             tg_user_id = params["message"]["from"]["id"]
             tg_chat_id = params["message"]["chat"]["id"]
             if tg_user_id != tg_chat_id
-                send_message('sendMessage', {:chat_id => tg_chat_id, :text => "⚠️ Only for <u>personal</u> usage", :parse_mode => 'HTML'})
+                send_query('sendMessage', {:chat_id => tg_chat_id, :text => "⚠️ Only for <u>personal</u> usage", :parse_mode => 'HTML'})
                 statuscode = 203
             elsif message_text == "/start"
-                send_message('sendMessage', {:chat_id => tg_user_id, :text => "<b>Hello! 🙃</b> To activate your Webgram account enter the activation key here.", :parse_mode => 'HTML'})
+                send_query('sendMessage', {:chat_id => tg_user_id, :text => "<b>Hello! 🙃</b> To activate your Webgram account enter the activation key here.", :parse_mode => 'HTML'})
                 statuscode = 201
             elsif message_text.match?(/\A[^.]+\.[^.]+\.[^.]+\z/)
                 answer = ''
@@ -50,9 +50,9 @@ class TelegramController < ApplicationController
                     answer = "❌ <b>Something went wrong :/</b> <i>Activation key is not valid</i>"
                     statuscode = 401
                 end
-                send_message('sendMessage', {:chat_id => tg_user_id, :text => answer, :parse_mode => 'HTML'})
+                send_query('sendMessage', {:chat_id => tg_user_id, :text => answer, :parse_mode => 'HTML'})
             else
-                send_message('sendMessage', {:chat_id => tg_user_id, :text => "⚠️ I'm created to <b>receive</b> only <u>activation tokens</u>", :parse_mode => 'HTML'})
+                send_query('sendMessage', {:chat_id => tg_user_id, :text => "⚠️ I'm created to <b>receive</b> only <u>activation tokens</u>", :parse_mode => 'HTML'})
                 statuscode = 203
             end
         end
