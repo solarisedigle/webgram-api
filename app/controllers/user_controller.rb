@@ -67,11 +67,11 @@ class UserController < ApplicationController
     def profile
         statuscode = 200
         result = {}
-        user = User.active.where(username: params[:username]).includes(:posts)
+        user = User.active.where(username: params[:username])
         if(user.length > 0)
             result = {
                 :user => user_data_format(user[0]),
-                :posts => user[0].posts,
+                :posts => user[0].posts.size,
                 :subscribers => Subscription.where(user: user).count,
                 :subscriptions => Subscription.where(subscriber: user).count,
                 :likes => Like.where(user: user[0]).count,

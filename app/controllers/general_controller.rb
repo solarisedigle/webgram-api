@@ -89,7 +89,7 @@ class GeneralController < ApplicationController
         if params[:except] 
             except = params[:except]
         end
-        tags = Tag.where("name like ?", "%#{params[:tag]}%").where.not(name: except).limit(5).order("count_of_posts desc")
+        tags = Tag.where("name like '%#{params[:tag]}%'").where.not(name: except).limit(5).order("count_of_posts desc")
         render json: {tags: tags}, status: 200
     end
 end

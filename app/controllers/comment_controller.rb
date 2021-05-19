@@ -9,7 +9,7 @@ class CommentController < ApplicationController
                 comment.user = @user
                 comment.body = !params[:body].blank? ? CGI.escapeHTML(params[:body]) : ''
                 if(post[0].comments << comment)
-                    result = {:success => true, :comment=> comment}
+                    result = {:success => true, :comment=> comment.main_data}
                     statuscode = 200
                 else
                     result = {:success => false, :errors=> comment.errors}
@@ -36,7 +36,7 @@ class CommentController < ApplicationController
                 reply.post = comment[0].post
                 reply.body = !params[:body].nil? ? CGI.escapeHTML(params[:body]) : ''
                 if(comment[0].replies << reply)
-                    result = {:success => true, :comment=> reply}
+                    result = {:success => true, :comment=> reply.main_data}
                     statuscode = 200
                 else
                     result = {:success => false, :errors=> reply.errors}
@@ -76,5 +76,18 @@ class CommentController < ApplicationController
             statuscode = 403
         end
         render json: result, status: statuscode
+    end
+    def get_me
+        comments = Comment.where(id: params[:id]).includes([{replies: [:user]}])
+        statuscode = 404
+        comment_obj = {}
+        if(comments.length > 0)
+            comment_obj = {:comment => comments[0].main_data, :replies => []}
+            for reply in comments[0].replies do
+                comment_obj[:replies].push(reply.main_data)
+            end
+            statuscode = 200
+        end
+        render json: comment_obj, status: 200
     end
 end

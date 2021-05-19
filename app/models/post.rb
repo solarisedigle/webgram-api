@@ -5,7 +5,7 @@ class Post < ApplicationRecord
     belongs_to :user, required: true
     belongs_to :category, required: true
     has_many :likes, dependent: :destroy
-    has_many :comments, dependent: :destroy
+    has_many :comments, -> { where(:parent_id => nil).order(:created_at => :desc) }, dependent: :destroy
     has_many :tag_posts, dependent: :destroy, class_name: 'TagPost'
     has_many :tags, through: :tag_posts
     after_destroy :clean_data

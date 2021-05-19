@@ -169,7 +169,7 @@ RSpec.describe 'Posts tests', :type => :request do
     end
     it "Post Like | Exists" do
         post '/api/v1/post/' + @data[:alex_post]["id"].to_s + '/like', :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(205)
+        expect(response).to have_http_status(200)
         debug_print_likes(stage: 'Like')
     end
     it "Post Dislike | Fake post" do
@@ -186,7 +186,7 @@ RSpec.describe 'Posts tests', :type => :request do
     end
     it "Post Dislike | Like not exists" do
         delete '/api/v1/post/' + @data[:alex_post]["id"].to_s + '/like', :headers => {:Authorization => @data[:admin_jwt]}
-        expect(response).to have_http_status(205)
+        expect(response).to have_http_status(200)
         debug_print_likes(stage: 'Dislike')
     end
     it "Post Like | User delete" do

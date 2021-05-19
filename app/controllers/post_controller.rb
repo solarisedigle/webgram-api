@@ -95,15 +95,14 @@ class PostController < ApplicationController
                     like.user = @user
                     like.post = post[0]
                     if like.save()
-                        result = {:success => true}
-                        statuscode = 200
+                        return check_like
                     else
                         result = {:error => "Fatal server error: Like"}
                         statuscode = 500
                     end
                 else
-                    result = {:success => false, :error => "Like already exists"}
-                    statuscode = 205
+                    result = like_info()
+                    statuscode = 200
                 end
             else
                 result = {:error => "Fatal error: Post " + params[:id] + " not found"}
@@ -122,13 +121,15 @@ class PostController < ApplicationController
             post = Post.where(id: params[:id])
             if post.length > 0
                 if !(like = Like.find_by(user: @user, post: post[0])).nil?
-                    if !like.destroy()
+                    if like.destroy()
+                        return check_like
+                    else
                         result = {:error => "Fatal server error: dislike"}
                         statuscode = 500
                     end
                 else
-                    result = {:success => false, :error => "Like already doen't exists"}
-                    statuscode = 205
+                    result = like_info()
+                    statuscode = 200
                 end
             else
                 result = {:error => "Fatal error: Post " + params[:id] + " not found"}
@@ -139,5 +140,42 @@ class PostController < ApplicationController
             statuscode = 403
         end
         render json: result, status: statuscode
+    end
+    def like_info
+        like = Like.where(post_id: params[:id], user_id: @user["id"])
+        return {:isset => like.length, :summ => Like.where(post_id: params[:id]).length}
+    end
+    def check_like
+        render json: like_info(), status: 200
+    end
+    def get_by
+        request = []
+        if !params[:user].blank? 
+            request.push("(user_id = #{params[:user]})")
+        end
+        if !params[:title].blank? 
+            request.push("(name like '%#{params[:title]}%')")
+        end
+
+        requset = request.join('AND')
+        posts = Post.where(requset)
+            .offset(params[:offset].nil? ? 0 : params[:offset])
+            .limit(params[:limit].nil? ? 10 : params[:limit])
+            .includes([:user, {comments: [:user]}, :tags])
+            .order(params[:order].nil? ? 'created_at desc' : params[:order])
+        formed_posts = []
+        for post in posts do
+            post_obj = {
+                :post => post,
+                :user => post.user.main_data,
+                :comments => [],
+                :tags => post.tags
+            }
+            for comment in post.comments do
+                post_obj[:comments].push(comment.main_data)
+            end
+            formed_posts.push(post_obj)
+        end
+        render json: {posts: formed_posts, general: Post.where(requset).count}, status: 200
     end
 end

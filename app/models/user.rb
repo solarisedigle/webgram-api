@@ -3,9 +3,9 @@ class User < ApplicationRecord
     validates :description, length: { maximum: 200 }
     validates :password, presence: true
     
-    has_many :posts, dependent: :destroy
+    has_many :posts, -> { order(:created_at => :desc) }, dependent: :destroy
     has_many :likes, dependent: :destroy
-    has_many :comments, dependent: :destroy
+    has_many :comments, -> { order(:created_at => :desc) }, dependent: :destroy
 
     has_many :subscriptions, dependent: :destroy
     has_many :subscriber_rel, foreign_key: :user_id, class_name: 'Subscription'
@@ -14,4 +14,10 @@ class User < ApplicationRecord
     has_many :follows, through: :subscriber_rel, source: :user
 
     scope :active, -> { where("activated > 0")}
+    def main_data
+        return {
+            id: self.id,
+            username: self.username,
+        }
+    end
 end
