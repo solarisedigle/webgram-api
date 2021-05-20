@@ -153,22 +153,54 @@ class PostController < ApplicationController
         if !params[:user].blank? 
             request.push("(user_id = #{params[:user]})")
         end
-        if !params[:title].blank? 
-            request.push("(name like '%#{params[:title]}%')")
+        if !params[:users].blank?
+            if params[:users] == 'only_subscriptions' && @user[:role] != 'guest'
+                users_needed = []
+                for user in @user.follows do
+                    users_needed.push(user["id"])
+                end
+                if users_needed.length == 0
+                    render(json: {posts: [], general: 0}, status: 200) and return
+                end
+                request.push("(user_id in (#{users_needed.join(',')}))")
+            end 
+        end
+        if !params[:tag].blank?
+            tag = Tag.where(:name => params[:tag].strip!)
+            if tag.length == 0
+                render(json: {posts: [], general: 0}, status: 200) and return
+            end
+            tag_posts = TagPost.where(:tag_id => tag[0]["id"])
+            if tag_posts.length == 0
+                render(json: {posts: [], general: 0}, status: 200) and return
+            end
+            posts_fit = []
+            for tag_post in tag_posts do
+                posts_fit.push(tag_post["post_id"])
+            end
+            request.push("(id in (#{posts_fit.join(',')}))")
+        end
+        if (!params[:category].blank? && params[:category].to_i > 0)
+            request.push("(category_id = #{params[:category]})")
+        end
+        if !params[:text].blank? 
+            search_text = CGI.escapeHTML(params[:text]).downcase;
+            request.push("(lower(title) like '%#{search_text}%' OR lower(body) like '%#{search_text}%')")
         end
 
         requset = request.join('AND')
         posts = Post.where(requset)
             .offset(params[:offset].nil? ? 0 : params[:offset])
             .limit(params[:limit].nil? ? 10 : params[:limit])
-            .includes([:user, {comments: [:user]}, :tags])
-            .order(params[:order].nil? ? 'created_at desc' : params[:order])
+            .includes([:user, {comments: [:user]}, :tags, :category])
+            .order(params[:order].nil? ? 'created_at desc' : (params[:order] + ' NULLS LAST, created_at DESC'))
         formed_posts = []
         for post in posts do
             post_obj = {
                 :post => post,
                 :user => post.user.main_data,
                 :comments => [],
+                :category => post.category.name,
                 :tags => post.tags
             }
             for comment in post.comments do

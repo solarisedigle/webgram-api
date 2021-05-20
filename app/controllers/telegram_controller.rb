@@ -1,8 +1,7 @@
 require "net/http"
 class TelegramController < ApplicationController
     def send_query(method_name, param_data)
-        apikey = '1823283766:AAEou7GuSPE5dhWfDpOWKT-jT_-uMuSqAMw'
-        Rails.logger.debug '---CC | Telegram response: ' + Net::HTTP.post_form(URI.parse("https://api.telegram.org/bot" + apikey + "/" + method_name), param_data).body
+        Net::HTTP.post_form(URI.parse("https://api.telegram.org/bot" + ENV['WG_TH_KEY'] + "/" + method_name), param_data).body
     end
     def index
         if !params["message"].nil?

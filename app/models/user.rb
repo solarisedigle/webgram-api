@@ -18,6 +18,7 @@ class User < ApplicationRecord
         return {
             id: self.id,
             username: self.username,
+            role: self.role,
         }
     end
 end

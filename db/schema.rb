@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(version: 2021_05_14_102213) do
     t.string "image"
     t.bigint "user_id", null: false
     t.bigint "category_id", null: false
+    t.integer "count_of_likes", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["category_id"], name: "index_posts_on_category_id"
@@ -78,6 +79,8 @@ ActiveRecord::Schema.define(version: 2021_05_14_102213) do
     t.bigint "activated"
     t.string "role"
     t.integer "last_action"
+    t.integer "count_of_likes", default: 0
+    t.integer "count_of_subscribers", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["username"], name: "index_users_on_username", unique: true

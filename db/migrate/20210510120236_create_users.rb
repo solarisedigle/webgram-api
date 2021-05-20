@@ -7,6 +7,8 @@ class CreateUsers < ActiveRecord::Migration[6.1]
       t.integer :activated, :limit => 8
       t.string :role
       t.integer :last_action
+      t.integer :count_of_likes, :default => 0
+      t.integer :count_of_subscribers, :default => 0
 
       t.timestamps
     end

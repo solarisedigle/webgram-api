@@ -72,9 +72,9 @@ class UserController < ApplicationController
             result = {
                 :user => user_data_format(user[0]),
                 :posts => user[0].posts.size,
-                :subscribers => Subscription.where(user: user).count,
+                :subscribers => user[0]["count_of_subscribers"],
                 :subscriptions => Subscription.where(subscriber: user).count,
-                :likes => Like.where(user: user[0]).count,
+                :likes => user[0]["count_of_likes"],
                 :comments => Comment.where(user: user[0]).count,
                 :self => @user["id"] == user[0]["id"],
             }
@@ -183,6 +183,34 @@ class UserController < ApplicationController
             end
         else
             result = {:error => "Only registered user can interact"}
+            statuscode = 403
+        end
+        render json: result, status: statuscode
+    end
+    def search_users
+        if !params[:user] 
+            params[:user] = ''
+        end
+        users = User.active.where("username like '%#{params[:user]}%'").limit(7).order("count_of_subscribers DESC")
+        render json: {users: users}, status: 200
+    end
+    def promote
+        statuscode = 200
+        result = {:success => true}
+        if (@user["role"] == "admin")
+            user = User.where(id: params[:id])
+            if user.length > 0
+                user[0]["role"] = "admin"
+                if !user[0].save()
+                    statuscode = 500
+                    result = {:error => "Fatal server error: User " + params[:id] + " destroy"}
+                end
+            else
+                result = {:error => "Fatal error: User " + params[:id] + " not found"}
+                statuscode = 404
+            end
+        else
+            result = {:error => "Permission eror"}
             statuscode = 403
         end
         render json: result, status: statuscode

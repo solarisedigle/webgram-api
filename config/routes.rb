@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   post 'api/v1/user', to: 'user#register'
   get 'api/v1/user/:id/getRelation', to: 'user#get_relation'
   post 'api/v1/user/:id/subscribe', to: 'user#subscribe'
+  post 'api/v1/user/:id/promote', to: 'user#promote'
   delete 'api/v1/user/:id/subscribe', to: 'user#unsubscribe'
   delete 'api/v1/user/:id', to: 'user#kick'
   get 'api/v1/user/:id', to: 'user#view'
@@ -29,4 +30,6 @@ Rails.application.routes.draw do
   get 'api/v1/comment/:id', to: 'comment#get_me'
   get 'api/v1/tagsAutocomplete/', to: 'general#complete_tags'
   get 'api/v1/tagsAutocomplete/:tag', to: 'general#complete_tags'
+  get 'api/v1/searchUsers/', to: 'user#search_users'
+  get 'api/v1/searchUsers/:user', to: 'user#search_users'
 end
