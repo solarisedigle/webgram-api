@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   get 'api/v1/user/:id/getRelation', to: 'user#get_relation'
   post 'api/v1/user/:id/subscribe', to: 'user#subscribe'
   post 'api/v1/user/:id/promote', to: 'user#promote'
+  post 'api/v1/user/description', to: 'user#edit_description'
   delete 'api/v1/user/:id/subscribe', to: 'user#unsubscribe'
   delete 'api/v1/user/:id', to: 'user#kick'
   get 'api/v1/user/:id', to: 'user#view'

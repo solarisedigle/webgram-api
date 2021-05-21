@@ -199,6 +199,27 @@ class UserController < ApplicationController
         users = User.active.where("username like '%#{params[:user]}%'").limit(7).order("count_of_subscribers DESC")
         render json: {users: users}, status: 200
     end
+    def edit_description
+        statuscode = 200
+        result = {:success => true}
+        if(@user[:role] != 'guest')
+            if(!params[:description].nil? && params[:description].is_a?(String))
+                @user.description = CGI.escapeHTML(params[:description])
+                if !@user.save()
+                    statuscode = 500
+                    result = {:error => 'Server error'}
+                end
+                
+            else
+                statuscode = 422
+                result = {:error => 'Invalid data'}
+            end
+        else
+            statuscode = 403
+            result = {:error => 'Permission error'}
+        end
+        render json: result, status: statuscode
+    end
     def promote
         statuscode = 200
         result = {:success => true}

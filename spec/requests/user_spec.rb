@@ -173,6 +173,29 @@ RSpec.describe 'User tests', :type => :request do
         delete '/api/v1/user/' + @data[:users][0]["id"].to_s, :headers => {:Authorization => @data[:admin_jwt]}
         expect(response).to have_http_status(200)
     end
+    it "Change description | No Auth" do
+        post '/api/v1/user/description'
+        expect(response).to have_http_status(403)
+    end
+    it "Change description | No data" do
+        post '/api/v1/user/description', :headers => {:Authorization => @data[:admin_jwt]}
+        debug_print()
+        expect(response).to have_http_status(422)
+    end
+    it "Change description | wrong data" do
+        post '/api/v1/user/description', :headers => {:Authorization => @data[:admin_jwt]}, :params => {
+            :description => ["hello"]
+        }
+        debug_print()
+        expect(response).to have_http_status(422)
+    end
+    it "Change description" do
+        post '/api/v1/user/description', :headers => {:Authorization => @data[:admin_jwt]}, :params => {
+            :description => "hello"
+        }
+        debug_print()
+        expect(response).to have_http_status(200)
+    end
     it "User delete | Suicide" do
         delete '/api/v1/user/' + @data[:users][1]["id"].to_s, :headers => {:Authorization => @data[:second_jwt_auth_token]}
         expect(response).to have_http_status(200)
