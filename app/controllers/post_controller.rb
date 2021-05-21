@@ -200,7 +200,7 @@ class PostController < ApplicationController
                 :post => post,
                 :user => post.user.main_data,
                 :comments => [],
-                :category => post.category.name,
+                :category => post.category,
                 :tags => post.tags
             }
             for comment in post.comments do
