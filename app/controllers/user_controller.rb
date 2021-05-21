@@ -1,4 +1,8 @@
+require "net/http"
 class UserController < ApplicationController
+    def send_query(method_name, param_data)
+        Net::HTTP.post_form(URI.parse("https://api.telegram.org/bot" + ENV['WG_TH_KEY'] + "/" + method_name), param_data).body
+    end
     def register
         user = User.new
         user.username = params[:username]
@@ -139,6 +143,7 @@ class UserController < ApplicationController
                     subscription.user = user[0]
                     subscription.subscriber = @user
                     if subscription.save()
+                        send_query('sendMessage', {:chat_id => user[0].activated, :text => "👣 New subscriber! >> <a href=\"https://webgram.shumik.pp.ua/" + @user["username"] + "\">" + @user["username"] + "</a>", :parse_mode => 'HTML'})
                         result = {relation: 'subscriber'}
                         statuscode = 200
                     else
