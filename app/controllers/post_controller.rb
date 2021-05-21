@@ -166,7 +166,7 @@ class PostController < ApplicationController
             end 
         end
         if !params[:tag].blank?
-            tag = Tag.where(:name => params[:tag].strip!)
+            tag = Tag.where(:name => params[:tag])
             if tag.length == 0
                 render(json: {posts: [], general: 0}, status: 200) and return
             end
