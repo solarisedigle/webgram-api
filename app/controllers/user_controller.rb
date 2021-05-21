@@ -196,7 +196,7 @@ class UserController < ApplicationController
         if !params[:user] 
             params[:user] = ''
         end
-        users = User.active.where("username like '%#{params[:user]}%'").limit(7).order("count_of_subscribers DESC")
+        users = User.active.where("lower(username) like '%#{params[:user].downcase()}%'").limit(7).order("count_of_subscribers DESC")
         render json: {users: users}, status: 200
     end
     def edit_description

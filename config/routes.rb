@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   post 'api/v1/login', to: 'user#login'
   post 'api/v1/getMe', to: 'user#get_me'
   get 'api/v1/user', to: 'user#print_all'
-  get 'api/v1/user/profile/:username', to: 'user#profile'
+  get 'api/v1/user/profile/:username', to: 'user#profile', constraints: { username: /[^\/]+/ }
   post 'api/v1/user', to: 'user#register'
   get 'api/v1/user/:id/getRelation', to: 'user#get_relation'
   post 'api/v1/user/:id/subscribe', to: 'user#subscribe'
@@ -32,5 +32,5 @@ Rails.application.routes.draw do
   get 'api/v1/tagsAutocomplete/', to: 'general#complete_tags'
   get 'api/v1/tagsAutocomplete/:tag', to: 'general#complete_tags'
   get 'api/v1/searchUsers/', to: 'user#search_users'
-  get 'api/v1/searchUsers/:user', to: 'user#search_users'
+  get 'api/v1/searchUsers/:user', to: 'user#search_users', constraints: { username: /[^\/]+/ }
 end
