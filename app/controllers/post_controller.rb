@@ -1,4 +1,8 @@
+require "net/http"
 class PostController < ApplicationController
+    def send_query(method_name, param_data)
+        Net::HTTP.post_form(URI.parse("https://api.telegram.org/bot" + ENV['WG_TH_KEY'] + "/" + method_name), param_data).body
+    end
     def create
         statuscode = 200
         result = {:success => true}
@@ -95,6 +99,7 @@ class PostController < ApplicationController
                     like.user = @user
                     like.post = post[0]
                     if like.save()
+                        send_query('sendMessage', {:chat_id => like.post.user.activated, :text => "❤️ <a href=\"https://webgram.shumik.pp.ua/" + @user["username"] + "\">" + @user["username"] + "</a> liked your post!", :parse_mode => 'HTML'})
                         return check_like
                     else
                         result = {:error => "Fatal server error: Like"}

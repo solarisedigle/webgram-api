@@ -1,4 +1,8 @@
+require "net/http"
 class CommentController < ApplicationController
+    def send_query(method_name, param_data)
+        Net::HTTP.post_form(URI.parse("https://api.telegram.org/bot" + ENV['WG_TH_KEY'] + "/" + method_name), param_data).body
+    end
     def create
         statuscode = 200
         result = {:success => true}
@@ -11,6 +15,7 @@ class CommentController < ApplicationController
                 if(post[0].comments << comment)
                     result = {:success => true, :comment=> comment.main_data}
                     statuscode = 200
+                    send_query('sendMessage', {:chat_id => post[0].user.activated, :text => "💬 <a href=\"https://webgram.shumik.pp.ua/" + @user["username"] + "\">" + @user["username"] + "</a> commented your post!", :parse_mode => 'HTML'})
                 else
                     result = {:success => false, :errors=> comment.errors}
                     statuscode = 422
@@ -37,6 +42,7 @@ class CommentController < ApplicationController
                 reply.body = !params[:body].nil? ? CGI.escapeHTML(params[:body]) : ''
                 if(comment[0].replies << reply)
                     result = {:success => true, :comment=> reply.main_data}
+                    send_query('sendMessage', {:chat_id => comment[0].user.activated, :text => "🗣 <a href=\"https://webgram.shumik.pp.ua/" + @user["username"] + "\">" + @user["username"] + "</a> replied to your comment!", :parse_mode => 'HTML'})
                     statuscode = 200
                 else
                     result = {:success => false, :errors=> reply.errors}
