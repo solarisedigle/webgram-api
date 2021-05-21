@@ -27,7 +27,7 @@ class TelegramController < ApplicationController
                             if same_th.length == 0
                                 user.activated = tg_user_id
                                 if user.save()
-                                    answer = "✅ <b>Yeach!</b> <i>Your account successfully activated!</i>"
+                                    answer = "✅ <b>Yeach!</b> <i>Your account successfully activated!</i>\n--\n<code>If your account is still not activated - just try to send code again.</code>"
                                 else
                                     answer = answer = "❌ <b>Something went wrong :/</b> <i>Try again later</i>"
                                     statuscode = 500
