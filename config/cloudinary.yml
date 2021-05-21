@@ -1,0 +1,19 @@
+---
+development:
+  cloud_name: shumiks
+  api_key: '961222883523842'
+  api_secret: a3OvNOYXngZT8pfQisJyDmnmbm8
+  enhance_image_tag: true
+  static_file_support: false
+production:
+  cloud_name: shumiks
+  api_key: '961222883523842'
+  api_secret: a3OvNOYXngZT8pfQisJyDmnmbm8
+  enhance_image_tag: true
+  static_file_support: true
+test:
+  cloud_name: shumiks
+  api_key: '961222883523842'
+  api_secret: a3OvNOYXngZT8pfQisJyDmnmbm8
+  enhance_image_tag: true
+  static_file_support: false

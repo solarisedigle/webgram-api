@@ -10,10 +10,16 @@ class ApplicationController < ActionController::API
                 decoded_token = JWT.decode(request.headers["Authorization"], @secret_key, { algorithm: 'HS256' })
                 @user = User.where(id: decoded_token[0]["user"])
                 if @user.length != 1 
-                    render json: {:error => "Fatal error: User " + decoded_token[0]["user"] + " not found"}
+                    render json: {:error => "Fatal error: User " + decoded_token[0]["user"].to_s + " not found"}, status: 401
+                else
+                    @user = @user[0]
                 end
             rescue JWT::DecodeError
-                render json: {:error => {:code => 401, :text => "Authorization token is not valid"}}
+                if(request.method != "GET")
+                    render json: {:error => "Authorization token is not valid"}, status: 401
+                else
+                    @user = {:role => 'guest'}
+                end
             end
         end
     end
