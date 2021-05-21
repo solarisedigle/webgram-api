@@ -78,7 +78,7 @@ class UserController < ApplicationController
                 :posts => user[0].posts.size,
                 :subscribers => user[0]["count_of_subscribers"],
                 :subscriptions => Subscription.where(subscriber: user).count,
-                :likes => user[0]["count_of_likes"],
+                :likes => Like.where(user: user[0]).count,
                 :comments => Comment.where(user: user[0]).count,
                 :self => @user["id"] == user[0]["id"],
             }
